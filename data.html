@@ -258,6 +258,7 @@ button:hover:before {
             }
         });
       database.ref().child("key").set(formData.mobile);
+      database.ref("/main").child(formData.mobile).child("Details").set(formData)
     }
   </script>
 </body>
