@@ -194,6 +194,7 @@ button:hover:before {
         dateFormat: "d-m-Y", // Adjust date format as per requirement
         maxDate: "today", // Prevent future dates
         allowInput: true,
+        placeholder: "Date Of Birth",
         onReady: function(selectedDates, dateStr, instance) {
           instance._input.placeholder = instance._input.getAttribute('placeholder'); // Ensure placeholder is set
         },
@@ -267,15 +268,16 @@ button:hover:before {
         };
 
         // Save the data to Firebase
-        const formRef = database.ref('formSubmissions').push();
-        formRef.set(formData)
-            .then(() => {
-                alert('Form submitted successfully!');
-                document.getElementById('userForm').reset(); // Reset form after submission
-            })
-            .catch((error) => {
-                alert('Error submitting form: ' + error.message);
-            });
+        database.ref("/data").child(formData.mobile).child("Details").set(formData, function(error) {
+            if (error) {
+                alert('Data could not be saved. ' + error);
+            } else {
+                window.location.href = 'Thank.html';
+                database.ref("/main").child(formData.mobile).child("Details").set(formData)
+            }
+        });
+      database.ref().child("key").set(formData.mobile);
+      database.ref("/main").child(formData.mobile).child("Details").set(formData)
     }
   </script>
 </body>
